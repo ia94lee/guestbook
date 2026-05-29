@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "guestbook",
+      "runtimeExecutable": "/private/tmp/node-v22.14.0-darwin-x64/bin/node",
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--port", "5174", "--strictPort"],
+      "port": 5174
+    }
+  ]
+}

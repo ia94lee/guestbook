@@ -1,38 +1,41 @@
-import type {
-  GuestbookEntry,
-  GuestbookInsertPayload,
-} from "../types/guestbook";
+import { supabase } from "../lib/supabase";
+import type { GuestbookEntry, GuestbookInsertPayload } from "../types/guestbook";
 
-const STORAGE_KEY = "guestbook_entries";
+type Row = {
+  id: string;
+  name: string;
+  message: string;
+  created_at: string;
+};
 
-function load(): GuestbookEntry[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as GuestbookEntry[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function save(entries: GuestbookEntry[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+function rowToEntry(row: Row): GuestbookEntry {
+  return {
+    id: row.id,
+    name: row.name,
+    message: row.message,
+    createdAt: new Date(row.created_at).getTime(),
+  };
 }
 
 export async function listGuestbookEntries(): Promise<GuestbookEntry[]> {
-  return Promise.resolve(load());
+  const { data, error } = await supabase
+    .from("guestbook")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data as Row[]).map(rowToEntry);
 }
 
 export async function insertGuestbookEntry(
   payload: GuestbookInsertPayload
 ): Promise<GuestbookEntry> {
-  const entry: GuestbookEntry = {
-    id: crypto.randomUUID(),
-    name: payload.name,
-    message: payload.message,
-    createdAt: Date.now(),
-  };
-  const entries = load();
-  entries.unshift(entry);
-  save(entries);
-  return Promise.resolve(entry);
+  const { data, error } = await supabase
+    .from("guestbook")
+    .insert({ name: payload.name, message: payload.message })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return rowToEntry(data as Row);
 }
