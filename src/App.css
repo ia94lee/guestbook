@@ -27,3 +27,18 @@
   flex-direction: column;
   gap: 2.25rem;
 }
+
+.app__signout {
+  margin-top: 0.75rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+  background: none;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.app__signout:hover {
+  background: #f3f4f6;
+}
